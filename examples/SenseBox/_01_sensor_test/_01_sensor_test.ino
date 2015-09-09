@@ -6,15 +6,14 @@
 
 #include <Wire.h>
 #include <HDC100X.h>
-#include <Adafruit_Sensor.h>
-#include "Adafruit_TSL2591.h"
 #include "BMP280.h"
+#include <Makerblog_TSL45315.h>
 
 #define I2C_ADDR 0x38
 #define IT_1   0x1 //1T
 
+Makerblog_TSL45315 luxsensor = Makerblog_TSL45315(TSL45315_TIME_M4);
 HDC100X HDC1(0x43);
-Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 BMP280 bmp;
 
 void setup() {
@@ -23,9 +22,7 @@ void setup() {
   
   HDC1.begin(HDC100X_TEMP_HUMI,HDC100X_14BIT,HDC100X_14BIT,DISABLE);
   
-  tsl.begin();
-  tsl.setGain(TSL2591_GAIN_MED);
-  tsl.setTiming(TSL2591_INTEGRATIONTIME_100MS);
+  luxsensor.begin();
   
   bmp.begin();
   bmp.setOversampling(4);
@@ -50,8 +47,9 @@ void loop() {
   bmp.getTemperatureAndPressure(T,P);
   Serial.print("Luftdruck:           ");Serial.print(P,2); Serial.println(" hPa");
   delay(200);
-  
-  unifiedSensorAPIRead();
+
+  uint32_t lux = luxsensor.readLux();
+  Serial.print("Beleuchtungsstaerke: ");Serial.print(lux, DEC); Serial.println(" lx");
   
   byte msb=0, lsb=0;
   uint16_t uv;
@@ -71,26 +69,5 @@ void loop() {
   Serial.print("UV-Strahlung:        ");Serial.print(uv, DEC);Serial.println(" uW/cm2"); //output in steps (16bit)
   
   Serial.println();
-  delay(2000);
-}
-
-void unifiedSensorAPIRead(void)
-{
-  /* Get a new sensor event */ 
-  sensors_event_t event;
-  tsl.getEvent(&event);
-
-  if ((event.light == 0) |
-      (event.light > 4294966000.0) | 
-      (event.light <-4294966000.0))
-  {
-    /* If event.light = 0 lux the sensor is probably saturated */
-    /* and no reliable data could be generated! */
-    /* if event.light is +/- 4294967040 there was a float over/underflow */
-    Serial.println("Invalid data (adjust gain or timing)");
-  }
-  else
-  {
-    Serial.print("Beleuchtungsstaerke: ");Serial.print(event.light); Serial.println(" lx");
-  }
+  delay(5000);
 }
