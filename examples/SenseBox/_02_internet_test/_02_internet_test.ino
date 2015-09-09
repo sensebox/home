@@ -15,7 +15,8 @@ EthernetClient client;
 
 void setup() {
   Serial.begin(9600);
-
+  Serial.println("Starte Internettest.");
+  Serial.println();
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
     Ethernet.begin(mac, ip);
@@ -24,18 +25,17 @@ void setup() {
   delay(1000);
   Serial.print("Teste Internetverbindung...");
 
-  // if you get a connection, report back via serial:
+  
   if (client.connect(server, 80)) {
     Serial.println("verbunden!");
     Serial.println();
     // Make a HTTP request:
-    client.println("GET / HTTP/1.1");
+    client.println("GET /ncsi.txt HTTP/1.1");
     client.println("Host: www.opensensemap.org");
     client.println("Connection: close");
     client.println();
   }
   else {
-    // kf you didn't get a connection to the server:
     Serial.println("Verbindung fehlgeschlagen!");
   }
 }
@@ -49,7 +49,6 @@ void loop()
 
   if (!client.connected()) {
     Serial.println();
-    Serial.println("Verbindung trennen.");
     client.stop();
 
     while (true);
