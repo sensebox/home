@@ -106,7 +106,7 @@ class BMP280
 		char error;
 };
 
-#define BMP280_ADDR 0x76 // 7-bit address
+#define BMP280_ADDR 0x77 // 7-bit address
 
 #define	BMP280_REG_CONTROL 0xF4
 #define	BMP280_REG_RESULT_PRESSURE 0xF7			// 0xF7(msb) , 0xF8(lsb) , 0xF9(xlsb) : stores the pressure data.
